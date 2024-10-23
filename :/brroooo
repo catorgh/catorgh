@@ -1,30 +1,47 @@
--- 服務器端腳本：增加Cash貨幣
-local function addCash(player, amount)
-    if player and player:FindFirstChild("leaderstats") then
-        local cash = player.leaderstats:FindFirstChild("Money")
-        if cash then
-            cash.Value = cash.Value + amount
-        end
-    end
-end
+-- 服務器腳本，通常放在ServerScriptService
+local replicatedStorage = game:GetService("ReplicatedStorage")
 
--- 當玩家加入遊戲時，檢查是否已有leaderstats，若無則創建
+-- 創建 AddMoney RemoteEvent
+local addMoneyEvent = Instance.new("RemoteEvent")
+addMoneyEvent.Name = "AddMoney"
+addMoneyEvent.Parent = replicatedStorage
+
+-- 當玩家加入遊戲時，確保他們有leaderstats和Money
 game.Players.PlayerAdded:Connect(function(player)
-    if not player:FindFirstChild("leaderstats") then
-        local leaderstats = Instance.new("Folder")
+    local leaderstats = player:FindFirstChild("leaderstats")
+    if not leaderstats then
+        leaderstats = Instance.new("Folder")
         leaderstats.Name = "leaderstats"
         leaderstats.Parent = player
     end
 
-    if not player.leaderstats:FindFirstChild("Money") then
-        local cash = Instance.new("IntValue")
-        cash.Name = "Cash"
-        cash.Value = 10000 -- 初始金額
-        cash.Parent = player.leaderstats
+    local money = leaderstats:FindFirstChild("Money")
+    if not money then
+        money = Instance.new("IntValue")
+        money.Name = "Money"
+        money.Value = 10000
+        money.Parent = leaderstats
     end
 end)
 
--- 使用RemoteEvent來增加Cash
-game.ReplicatedStorage.AddCash.OnServerEvent:Connect(function(player, amount)
-    addCash(player, amount)
+-- 使用RemoteEvent來增加Money
+addMoneyEvent.OnServerEvent:Connect(function(player, amount)
+    local leaderstats = player:FindFirstChild("leaderstats")
+    if leaderstats then
+        local money = leaderstats:FindFirstChild("Money")
+        if money then
+            money.Value = money.Value + amount
+        end
+    end
+end)
+
+-- 客戶端腳本，通常放在StarterPlayerScripts
+local player = game.Players.LocalPlayer
+local addMoneyEventClient = replicatedStorage:WaitForChild("AddMoney")
+
+-- 示例：當玩家聊天輸入 "/addmoney" 時，增加Money
+player.Chatted:Connect(function(msg)
+    if msg == "!addmoney" then
+        addMoneyEventClient:FireServer(100)
+    end
 end)
