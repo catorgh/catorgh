@@ -1,0 +1,30 @@
+-- 服務器端腳本：增加Cash貨幣
+local function addCash(player, amount)
+    if player and player:FindFirstChild("leaderstats") then
+        local cash = player.leaderstats:FindFirstChild("Cash")
+        if cash then
+            cash.Value = cash.Value + amount
+        end
+    end
+end
+
+-- 當玩家加入遊戲時，檢查是否已有leaderstats，若無則創建
+game.Players.PlayerAdded:Connect(function(player)
+    if not player:FindFirstChild("leaderstats") then
+        local leaderstats = Instance.new("Folder")
+        leaderstats.Name = "leaderstats"
+        leaderstats.Parent = player
+    end
+
+    if not player.leaderstats:FindFirstChild("Cash") then
+        local cash = Instance.new("IntValue")
+        cash.Name = "Cash"
+        cash.Value = 0 -- 初始金額
+        cash.Parent = player.leaderstats
+    end
+end)
+
+-- 使用RemoteEvent來增加Cash
+game.ReplicatedStorage.AddCash.OnServerEvent:Connect(function(player, amount)
+    addCash(player, amount)
+end)
