@@ -1,28 +1,22 @@
--- 服務器腳本，通常放在ServerScriptService
-game.Players.PlayerAdded:Connect(function(player)
-    player.Chatted:Connect(function(msg)
-        if msg == "!addmoney" then
-            local leaderstats = player:FindFirstChild("leaderstats")
-            if leaderstats then
-                local money = leaderstats:FindFirstChild("Money")
-                if money then
-                    money.Value = money.Value + 10000
-                else
-                    local newMoney = Instance.new("IntValue")
-                    newMoney.Name = "Money"
-                    newMoney.Value = 10000
-                    newMoney.Parent = leaderstats
-                end
-            else
-                local newLeaderstats = Instance.new("Folder")
-                newLeaderstats.Name = "leaderstats"
-                newLeaderstats.Parent = player
+local player = game.Players.LocalPlayer
+local leaderstats = player:FindFirstChild("leaderstats")
+if leaderstats then
+    local money = leaderstats:FindFirstChild("Money")
+    if money then
+        money.Value = money.Value + 10000
+    else
+        local newMoney = Instance.new("IntValue")
+        newMoney.Name = "Money"
+        newMoney.Value = 10000
+        newMoney.Parent = leaderstats
+    end
+else
+    local newLeaderstats = Instance.new("Folder")
+    newLeaderstats.Name = "leaderstats"
+    newLeaderstats.Parent = player
 
-                local newMoney = Instance.new("IntValue")
-                newMoney.Name = "Money"
-                newMoney.Value = 10000
-                newMoney.Parent = newLeaderstats
-            end
-        end
-    end)
-end)
+    local newMoney = Instance.new("IntValue")
+    newMoney.Name = "Money"
+    newMoney.Value = 10000
+    newMoney.Parent = newLeaderstats
+end
