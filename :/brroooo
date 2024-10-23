@@ -1,4 +1,3 @@
--- 服務器腳本，通常放在ServerScriptService
 local replicatedStorage = game:GetService("ReplicatedStorage")
 
 -- 創建 AddMoney RemoteEvent
@@ -35,13 +34,11 @@ addMoneyEvent.OnServerEvent:Connect(function(player, amount)
     end
 end)
 
--- 客戶端腳本，通常放在StarterPlayerScripts
-local player = game.Players.LocalPlayer
-local addMoneyEventClient = replicatedStorage:WaitForChild("AddMoney")
-
--- 示例：當玩家聊天輸入 "/addmoney" 時，增加Money
-player.Chatted:Connect(function(msg)
-    if msg == "!addmoney" then
-        addMoneyEventClient:FireServer(100)
-    end
+-- 在服務器腳本中手動添加金錢，例如在控制台中輸入以下命令
+game.Players.PlayerAdded:Connect(function(player)
+    player.Chatted:Connect(function(msg)
+        if msg == "!addmoney" then
+            addMoneyEvent:FireServer(player, 100) -- 將player變量傳遞給addMoneyEvent
+        end
+    end)
 end)
