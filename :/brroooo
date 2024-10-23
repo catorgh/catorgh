@@ -1,22 +1,48 @@
-local player = game.Players.LocalPlayer
-local leaderstats = player:FindFirstChild("leaderstats")
-if leaderstats then
-    local money = leaderstats:FindFirstChild("Money")
-    if money then
-        money.Value = money.Value + 10000
-    else
-        local newMoney = Instance.new("IntValue")
-        newMoney.Name = "Money"
-        newMoney.Value = 10000
-        newMoney.Parent = leaderstats
-    end
-else
-    local newLeaderstats = Instance.new("Folder")
-    newLeaderstats.Name = "leaderstats"
-    newLeaderstats.Parent = player
+local replicatedStorage = game:GetService("ReplicatedStorage")
+local players = game:GetService("Players")
 
-    local newMoney = Instance.new("IntValue")
-    newMoney.Name = "Money"
-    newMoney.Value = 10000
-    newMoney.Parent = newLeaderstats
-end
+-- 創建 AddMoney RemoteEvent
+local addMoneyEvent = Instance.new("RemoteEvent")
+addMoneyEvent.Name = "AddMoney"
+addMoneyEvent.Parent = replicatedStorage
+
+-- 當玩家加入遊戲時，確保他們有leaderstats和Money
+players.PlayerAdded:Connect(function(player)
+    local leaderstats = player:FindFirstChild("leaderstats")
+    if not leaderstats then
+        leaderstats = Instance.new("Folder")
+        leaderstats.Name = "leaderstats"
+        leaderstats.Parent = player
+    end
+
+    local money = leaderstats:FindFirstChild("Money")
+    if not money then
+        money = Instance.new("IntValue")
+        money.Name = "Money"
+        money.Value = 0
+        money.Parent = leaderstats
+    end
+
+    -- 客戶端腳本，創建GUI按鈕
+    local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+    local button = Instance.new("TextButton", screenGui)
+    button.Size = UDim2.new(0, 200, 0, 50)
+    button.Position = UDim2.new(0.5, -100, 0.5, -25)
+    button.Text = "增加1000Money"
+
+    -- 點擊按鈕時，發送增加Money的請求到伺服器端
+    button.MouseButton1Click:Connect(function()
+        replicatedStorage.AddMoney:FireServer(1000)
+    end)
+end)
+
+-- 使用RemoteEvent來增加Money
+addMoneyEvent.OnServerEvent:Connect(function(player, amount)
+    local leaderstats = player:FindFirstChild("leaderstats")
+    if leaderstats then
+        local money = leaderstats:FindFirstChild("Money")
+        if money then
+            money.Value = money.Value + amount
+        end
+    end
+end)
