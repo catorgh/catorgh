@@ -1,44 +1,28 @@
-local replicatedStorage = game:GetService("ReplicatedStorage")
-
--- 創建 AddMoney RemoteEvent
-local addMoneyEvent = Instance.new("RemoteEvent")
-addMoneyEvent.Name = "AddMoney"
-addMoneyEvent.Parent = replicatedStorage
-
--- 當玩家加入遊戲時，確保他們有leaderstats和Money
-game.Players.PlayerAdded:Connect(function(player)
-    local leaderstats = player:FindFirstChild("leaderstats")
-    if not leaderstats then
-        leaderstats = Instance.new("Folder")
-        leaderstats.Name = "leaderstats"
-        leaderstats.Parent = player
-    end
-
-    local money = leaderstats:FindFirstChild("Money")
-    if not money then
-        money = Instance.new("IntValue")
-        money.Name = "Money"
-        money.Value = 10000
-        money.Parent = leaderstats
-    end
-end)
-
--- 使用RemoteEvent來增加Money
-addMoneyEvent.OnServerEvent:Connect(function(player, amount)
-    local leaderstats = player:FindFirstChild("leaderstats")
-    if leaderstats then
-        local money = leaderstats:FindFirstChild("Money")
-        if money then
-            money.Value = money.Value + amount
-        end
-    end
-end)
-
--- 在服務器腳本中手動添加金錢，例如在控制台中輸入以下命令
+-- 服務器腳本，通常放在ServerScriptService
 game.Players.PlayerAdded:Connect(function(player)
     player.Chatted:Connect(function(msg)
         if msg == "!addmoney" then
-            addMoneyEvent:FireServer(player, 100) -- 將player變量傳遞給addMoneyEvent
+            local leaderstats = player:FindFirstChild("leaderstats")
+            if leaderstats then
+                local money = leaderstats:FindFirstChild("Money")
+                if money then
+                    money.Value = money.Value + 10000
+                else
+                    local newMoney = Instance.new("IntValue")
+                    newMoney.Name = "Money"
+                    newMoney.Value = 10000
+                    newMoney.Parent = leaderstats
+                end
+            else
+                local newLeaderstats = Instance.new("Folder")
+                newLeaderstats.Name = "leaderstats"
+                newLeaderstats.Parent = player
+
+                local newMoney = Instance.new("IntValue")
+                newMoney.Name = "Money"
+                newMoney.Value = 10000
+                newMoney.Parent = newLeaderstats
+            end
         end
     end)
 end)
