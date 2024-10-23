@@ -1,7 +1,7 @@
 -- 服務器端腳本：增加Cash貨幣
 local function addCash(player, amount)
     if player and player:FindFirstChild("leaderstats") then
-        local cash = player.leaderstats:FindFirstChild("Cash")
+        local cash = player.leaderstats:FindFirstChild("Money")
         if cash then
             cash.Value = cash.Value + amount
         end
@@ -16,10 +16,10 @@ game.Players.PlayerAdded:Connect(function(player)
         leaderstats.Parent = player
     end
 
-    if not player.leaderstats:FindFirstChild("Cash") then
+    if not player.leaderstats:FindFirstChild("Money") then
         local cash = Instance.new("IntValue")
         cash.Name = "Cash"
-        cash.Value = 0 -- 初始金額
+        cash.Value = 10000 -- 初始金額
         cash.Parent = player.leaderstats
     end
 end)
